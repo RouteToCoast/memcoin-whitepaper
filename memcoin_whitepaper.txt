@@ -1,0 +1,880 @@
+MEM
+Memcoin
+A peer to peer currency
+Version 1.0 · 2026
+
+
+────────────────────────────────────────
+
+
+Abstract
+
+Memcoin (MEM) is a minimal proof-of-work cryptocurrency.
+A memory-hard proof-of-work, zero-fee instant payments.
+
+
+
+────────────────────────────────────────
+
+
+1. Design Philosophy
+
+
+Goals, Not Parameters
+
+Memcoin is built around goals, not parameters. Every parameter exists to
+serve a goal. When a parameter no longer serves its goal, the parameter
+changes. The goal does not.
+
+The 7 GB memory requirement exists so ordinary computers can compete
+fairly. If home hardware changes, the threshold changes with it. The
+32 MB default block size exists to guarantee zero-fee payments enter
+the next block. The block size adjusts automatically with demand up to a
+hard cap of 64 MB. The numbers are adjustable. The intentions are not.
+
+
+Decentralisation as Consequence
+
+    "It's nice how anyone with just a CPU can compete fairly equally right now"
+    — start first block of the chain.
+
+Most networks lost this condition within years. Memcoin takes it as a
+design requirement. The 7 GB threshold makes cloud mining expensive and
+large pools unviable. Centralisation is structurally difficult, not
+merely discouraged. The intended mining landscape is produced by physics,
+not policy.
+
+Mining and validation carry identical resource requirements — 7 GB and
+approximately 3 seconds per block. Anyone running a node can mine. The
+distinction between participant and validator does not exist on this
+network.
+
+
+The Algorithm as a Guest
+
+A mining algorithm makes demands on hardware. Most algorithms treat this
+as irrelevant — the machine exists to serve the computation, and wear,
+heat, and noise are acceptable costs.
+
+Memcoin's algorithm is designed as a guest, not an occupant. The
+CPU–RAM breathing rhythm — 70 ns of memory access, 100 ns of
+computation, alternating without overlap — means neither component is
+saturated continuously.
+
+The memory cost eliminates economies of scale in mining. Each thread
+requires its own 7 GB — aggregation provides no reduction in per-unit
+cost. Large pools offer no competitive advantage over small pools of
+equivalent total hardware. The algorithm produces this outcome through
+cost, not rules.
+
+
+The Zero-Cost Miner
+
+A standard PC running 16 GB of system memory has the resources to
+mine Memcoin without displacing any existing workload. One thread
+mines. One thread holds the validation working set on standby.
+The remaining memory runs the machine as normal.
+
+Mining and normal computer use run concurrently without interference.
+
+The validation working set is idle between blocks — powered,
+allocated, waiting. That power was already being drawn. The mining
+thread uses CPU capacity that would otherwise sit unused. The
+marginal cost of participation is the electricity already being
+consumed by a machine left on.
+
+The participants are people who already own the machines.
+
+
+The Long View
+
+Gold is finite. It is lost, buried, forgotten — and occasionally found
+again. The total amount in circulation has never been a clean number. It
+decreases slowly as rings sink to the ocean floor and coins are sealed in
+walls. It increases slowly as old mines are reopened and forgotten caches
+are recovered. The supply is not managed. It simply is.
+
+Memcoin is designed around the same reality. A coin sent to a lost
+address is not destroyed — it is suspended. The private key exists
+somewhere. The ledger holds it with perfect fidelity. Unlike physical
+gold, it cannot be melted down or repurposed. It waits, exactly where it
+was placed, for a key that may never return.
+
+Every ledger accumulates this damage over time. Keys lost, addresses
+abandoned, coins frozen. The permanent 7 MEM floor reward slowly returns
+to circulation what time removes from it — not targeting any specific
+loss, not attempting to measure the damage. It runs quietly, indefinitely,
+as the chain's own recovery mechanism.
+
+Gold has survived thousands of years. Its supply is finite,
+unmanaged, and resistant to debasement. The
+chain will run for a long time. The parameters will change as the world
+changes. The commitment written into the first block will not.
+
+
+Completeness
+
+Memcoin is already what it intends to be. There is no roadmap because
+the destination has been reached. A currency simple enough to be fully
+understood by anyone who reads it.
+
+
+On Value
+
+bit is found in memory. It is the result of time and intelligence.
+
+A carbon brain drives a silicon chip. It runs through time, and relies
+on luck to find the right bit. This is proof that a mind existed.
+
+MEM is for giving. Whatever you want.
+
+
+────────────────────────────────────────
+
+
+2. Technical Specification
+
+
+2.1 Core Parameters
+
+Ticker                  MEM
+PoW Algorithm           Yesmem
+Block Time              600 seconds
+Max Block Size          32 MB (default), 64 MB (hard cap, ABLA)
+Difficulty Algorithm    ASERT (aserti3-2d)
+ASERT Half-life         7,200 s (2 hours)
+ASERT Anchor            Genesis block (hardcoded)
+P2P Port mainnet        9333
+RPC Port mainnet        9332
+P2P Port testnet        19333
+RPC Port testnet        19332
+Network Magic           0x4D454D43 (MEMC)
+Address Prefix          M (Base58Check, version byte 50)
+Genesis nBits           0x1f0ffff0
+Codebase                Bitcoin Cash Node v29.0.0
+
+The ASERT difficulty anchor is set to the genesis block. All subsequent
+difficulty calculations reference genesis height, genesis target, and
+genesis timestamp.
+
+
+2.2 Unit System
+
+1 𝕄 = 100 ᴍ = 100,000 ᴋ = 100,000,000 ʙ
+
+    Unit    Symbol   Unicode                  Definition
+    ──────  ───────  ───────────────────────  ──────────────────────────
+    MEM     𝕄        U+1D544                  base unit
+    mbit    ᴍ        U+1D0D                   1/100 MEM = 1,000,000 ʙ
+    kbit    ᴋ        U+1D0B                   1/100,000 MEM = 1,000 ʙ
+    bit     ʙ        U+0299                   1/100,000,000 MEM
+
+
+2.3 Proof-of-Work
+
+Yesmem derives from Yespower 1.0, with a 100-round serial multiplication
+chain inserted after each random memory access in smix2. The two steps
+are coupled — the chain's output determines the address of the next
+memory access. Removing either breaks the computation.
+
+Version                 YESMEM_1_0
+N (cost factor)         1,835,008
+r (block size)          32
+Personalization         Memcoin/Yesmem/v1
+Memory per thread       ~7 GB
+Serial mul rounds       100 (in smix2, injected twice per iteration)
+
+Memory per thread is derived directly from the parameters:
+128 × N × r = 128 × 1,835,008 × 32 = 7,516,192,768 bytes ≈ 7 GB
+
+7 GB exceeds the VRAM of most consumer GPUs while remaining within the
+system RAM of standard PC hardware (16–32 GB). A single consumer GPU
+cannot run the algorithm. A CPU with standard system memory can.
+
+Each iteration proceeds as follows:
+
+    1. Read a pseudorandom location from the 7 GB working set
+    2. Execute 100 rounds of serial multiplication:
+           x(n+1) = x(n) × 6364136223846793005 + 1442695040888963407
+           x(n+1) ^= x(n+1) >> ((x(n+1) >> 59) + 5)
+    3. XOR the chain output into the next memory address index
+    4. Write result back to the working set
+    5. Read the new address from the 7 GB working set
+    6. Execute 100 rounds of serial multiplication (same chain)
+    7. XOR the chain output into the next memory address index
+    8. Write result back to the working set
+    9. Repeat
+
+Strict sequentiality is a design requirement: each round of the
+multiplication chain takes the previous round's output as its only
+input. No iteration can begin until the preceding chain completes.
+This data dependency makes the chain incompressible — it cannot be
+unrolled, pipelined, or distributed across parallel execution units.
+SIMD instruction sets provide no benefit. A GPU core executing the
+chain performs identically to a CPU core: one round at a time, in
+order, at the speed of its serial execution path.
+
+The multiplication constant is taken from the PCG random number
+generator family and produces full-width state diffusion across all
+100 rounds.
+
+
+2.4 CPU–RAM Rhythm
+
+Each iteration alternates between a random memory access (~70 ns) and
+the serial multiplication chain (~100 ns). Neither component idles while
+the other runs.
+
+RAM duty cycle drops from ~100% to ~41%; CPU overhead remains
+negligible. Total thermal output is less than half of a continuous
+memory-bound workload. Long-term mining does not accelerate
+RAM degradation.
+
+
+2.5 Serial Chain Properties
+
+The 100-round multiplication chain is strictly serial. Each round
+requires the output of the previous round as input:
+
+    x(n+1) = f( x(n) )
+
+This data dependency prevents any form of parallelisation.
+SIMD instruction sets (AVX, SSE) provide no benefit. GPU execution
+units are forced into serial execution on the dependency chain. GPU
+throughput is further constrained by VRAM capacity — a single thread
+requires ~7 GB, limiting consumer GPUs to two or three concurrent
+threads regardless of core count.
+
+
+2.6 Optimization Ceiling
+
+Each iteration consists of two serial steps that cannot be
+reordered or parallelised:
+
+    Memory access    ~70 ns   — bounded by DRAM physical latency
+    Serial chain     ~100 ns  — bounded by CPU multiply latency
+    Total            ~170 ns  — ~5.9 million iterations/second/thread
+
+These figures sit near the physical limits of current semiconductor
+process nodes. The gap between hardware generations is measured in
+nanoseconds, not orders of magnitude.
+
+Three constraints close the optimization space completely. Memory
+capacity caps thread count at physical RAM ÷ 7 GB — no amount of
+computational speed increases this ratio. The serial multiplication
+chain eliminates all parallel acceleration paths: SIMD, multi-core,
+FPGA pipelines all reduce to single-core serial throughput.
+Read-write coupling eliminates prefetch and cache reuse — the chain
+output determines the next write address, so the address is unknown
+until the chain completes; the prefetch window is zero.
+
+Each constraint reinforces the others. No single constraint can be
+broken without violating the other two.
+
+
+2.7 Memory Generation Parity
+
+Advances in memory technology — from DDR4 to DDR5 and beyond —
+improve bandwidth and reduce latency by small margins each
+generation.
+
+The serial multiplication chain adds ~100 ns of fixed CPU
+computation to each iteration. Memory latency improvements
+of 2–3 ns per generation represent under 2% of total
+iteration time.
+
+Successive memory generations do not materially affect hash rate.
+Capacity determines competitiveness, not the generation of
+memory technology.
+
+
+2.8 Mining Scale Economics
+
+Each mining thread requires 7 GB of dedicated RAM that cannot be
+shared across machines. This figure is fixed by the algorithm
+parameters N and r — independent of CPU speed, memory bandwidth,
+or hardware generation. Mining capacity scales in strict linear
+proportion to memory held. Aggregation provides no reduction in
+per-unit mining memory cost.
+
+Validation overhead follows a variable ratio. Required validation
+threads scale as:
+
+    verify_threads = ceil(T × V / S)
+
+where T is total mining threads, V is validation time per share
+(hardware-determined), and S is share interval. 
+V is not a fixed value — it decreases as hardware improves.
+The validation overhead ratio V/S shrinks accordingly. This does
+not affect the fundamental constraint: mining memory remains 7 GB
+per thread regardless of hardware speed. The 7 GB capacity
+requirement is determined by N and r alone and cannot be
+accelerated away.
+
+A 5-minute share interval guarantees at least one share per
+10-minute block; a 3-minute interval yields approximately three.
+The benefit of more frequent share submission is directly paired
+with higher validation memory cost, which requires higher pool
+fees and reduces return per share. The advantage and its cost
+are inseparable.
+
+Large pools carry greater absolute cost and operational complexity
+with no efficiency gain over small pools. The domain of rational
+mining is small pools.
+
+
+────────────────────────────────────────
+
+
+3. Emission Schedule
+
+
+3.1 Stages 1–3 — Fixed Issuance (Years 0–9)
+Stage   Block Range              Reward        Total Issued
+──────  ───────────────────────  ────────────  ──────────────────
+1       0 – 157,499              50 MEM        7,875,000 MEM
+2       157,500 – 314,999        25 MEM        3,937,500 MEM
+3       315,000 – 472,499        12.5 MEM      1,968,750 MEM
+──────  ───────────────────────  ────────────  ──────────────────
+Total                                          13,781,250 MEM
+
+
+3.2 Stage 4 — Permanent Floor (Block 472,500+)
+
+Fixed at 7 MEM per block, yielding ~367,500 MEM / year in perpetuity.
+
+There is no hard cap. The terminal supply is an equilibrium — the point
+at which annual issuance equals annual supply lost to irreversible
+attrition.
+
+    S_eq = 367,500 ÷ 0.015 ≈ 24,500,000 MEM
+
+This figure is an estimate, not a protocol parameter. The loss rate is
+an assumption; the real rate is unknown and will vary over time. The
+equilibrium supply is not enforced by code — it is a consequence of
+how people use the chain. How much is lost, how much is spent, how much
+is held: these are human decisions, accumulated over time, that the
+formula can only approximate.
+
+
+3.3 Inflation & Loss Rate — MEM vs. Gold (20-Year Intervals)
+
+Assumptions
+
+                             MEM                  Gold
+──────────────────────────   ───────────────────  ──────────────────
+Annual loss rate             1.50%                0.20%
+Annual gross issuance        367,500 (fixed)      ~1.65% of stock
+
+Digital asset attrition arises from: private key loss, custodial
+failures, inheritance gaps, and unrecoverable wallets. Unlike physical
+commodities, on-chain losses are permanent and unrecoverable.
+
+
+MEM — Stage 4 Projection
+
+Year                  Circulating Supply   Gross Inflation   Loss Rate   Net Inflation
+────────────────────  ───────────────────  ────────────────  ──────────  ─────────────
+Y9 (Stage 4 start)    13,781,250           2.67%             1.50%       +1.17%
+Y29                   ~16,578,000          2.22%             1.50%       +0.72%
+Y49                   ~18,648,000          1.97%             1.50%       +0.47%
+Y69                   ~20,174,000          1.82%             1.50%       +0.32%
+Y89                   ~21,304,000          1.72%             1.50%       +0.22%
+Equilibrium           ~24,500,000          1.50%             1.50%       0%
+
+
+Gold — Reference (stable annual rates)
+
+Gross Inflation   Loss Rate   Net Inflation
+───────────────   ─────────   ──────────────────
+~1.65%            ~0.20%      ~1.45% (perpetual)
+
+Gold maintains a structurally positive net inflation indefinitely. MEM
+net inflation decelerates asymptotically toward zero as issuance
+converges with attrition — without any protocol intervention.
+
+
+3.4 Summary
+
+Property                  MEM                       Gold
+────────────────────────  ────────────────────────  ──────────────────
+Terminal supply           ~24,500,000 (emergent)    No ceiling
+Long-run net inflation    → 0%                      ~1.45% (stable)
+Supply floor mechanism    Permanent block reward    Annual mining
+Attrition type            Permanent, on-chain       Partial, recoverable
+
+
+────────────────────────────────────────
+
+
+4. Transaction Model
+
+
+4.1 Address Format
+
+P2PKH only. An address encodes the RIPEMD-160 hash of a compressed
+public key in Base58Check encoding with version byte 50.
+
+Base58:   M...   (version byte 50)
+
+P2SH and CashAddr are not supported. The address format is the complete
+set of valid destinations on this chain.
+
+
+4.2 Signatures
+
+Both ECDSA and Schnorr signatures are valid. The address format is
+identical — it encodes the public key hash, not the signature algorithm.
+ECDSA: 71–72 bytes (DER). Schnorr: 64 bytes (fixed).
+
+
+4.3 Schnorr and Multi-Party Spending
+
+Through the MuSig protocol, multiple parties can cooperate to produce a
+single aggregated Schnorr signature. On-chain it is indistinguishable
+from a standard single-party signature: one address, one 64-byte
+signature, same transaction size. The number of participants is not
+visible.
+
+OP_CHECKMULTISIG is not supported. MuSig is the only mechanism for
+multi-party signing on this chain.
+
+
+4.4 Time-Locking
+
+Two time-locking mechanisms are available: nLockTime at the transaction
+level, and OP_CHECKLOCKTIMEVERIFY (CLTV) at the script level. Both are
+active. nLockTime and OP_CLTV are the two supported time-locking primitives.
+
+
+────────────────────────────────────────
+
+
+5. Zero-Fee Instant Payment
+
+
+5.1 Philosophy
+
+The payer is the creator and sustainer of network value. The more active
+the payers, the greater the utility of the chain, the higher the value
+of MEM, and the greater the long-term income of miners from block
+rewards alone. Charging payers a fee reduces the incentive to transact.
+
+The instant payment system — TX1 and TX2 — is zero-fee by protocol. A
+sender who locks funds pays no transaction fee. The
+recipient who spends those funds pays no transaction fee. Miner income
+from these transactions is derived entirely from block rewards.
+
+The cheque book draws its design from the logic of a paper cheque.
+A signed cheque is an irrevocable commitment — the issuer cannot
+recall it, and the bank does not return funds because a cheque was
+never presented. The instant payment system encodes the same property at
+the protocol level.
+
+Once unlocked, a CLTV UTXO is spendable balance. Alice does not
+redeem it first and spend it second — the unlock is the payment.
+TX2 is simply the transaction that spends a CLTV UTXO. The two
+transaction types are separated by protocol: CLTV inputs are
+zero-fee and cannot be mixed with P2PKH inputs in the same
+transaction.
+
+
+5.2 Design
+
+Bob locks funds into standard-denomination UTXOs for 432 blocks using
+OP_CLTV. Each output is locked to Alice's address. The lock guarantees
+Bob cannot redirect or replace the funds. All payments settle on-chain
+when the lock expires.
+
+    TX1   Bob broadcasts TX1 — TX1 enters the mempool — payment is final
+          Outputs are locked to Alice's address
+          TX1 confirms on-chain at block H
+    TX2   After block H+432, Alice's CLTV UTXOs are spendable balance.
+          Alice spends them in a single zero-fee transaction —
+          combining any unlocked CLTV outputs, splitting to any
+          addresses, with no intermediate redemption step.
+          Confirmed at block H+434
+
+Payment is final when TX1 enters the mempool. mempoolreplacement=0
+prevents any conflicting transaction from entering the mempool. Bob is
+not making a promise to pay — the funds are already frozen. Only Alice
+can spend them.
+
+Traditional payment security looks backward: the deeper a transaction is
+buried under subsequent blocks, the harder it is to reverse. Memcoin's
+instant payment looks forward: the CLTV lock makes the future settlement
+as certain as any confirmed transaction, from the instant TX1 enters
+the mempool.
+
+TX1 and TX2 form a one-way pipeline:
+
+    Bob's P2PKH UTXO
+        ↓  TX1
+    CLTV-locked UTXOs  (frozen for 432 blocks, locked to Alice)
+        ↓  unlocks at H+433 — becomes spendable balance
+    TX2: Alice spends to any address, zero-fee, one block
+
+Alice holds full discretion. She may combine any unlocked CLTV
+UTXOs and distribute the funds to any number of addresses.
+
+Each UTXO created by TX1 is single-use. To issue further payments,
+Bob must create a new TX1.
+
+TX1 entering the mempool is an irrevocable commitment. 
+Bob relinquishes control of the locked outputs permanently.
+Alice holds the right to spend them at any time after block H+432.
+There is no expiry — a UTXO has no timeout mechanism. 
+As long as Alice retains the corresponding
+private key, the funds remain spendable. If Alice does not spend, the
+outputs remain frozen in the UTXO set indefinitely and do not revert
+to Bob.
+
+This property is stronger than a paper cheque, which typically carries
+a validity window of several months. A Memcoin cheque does not expire.
+This system is appropriate where both parties have confirmed intent
+to transact.
+
+
+5.3 Standard Denominations
+
+TX1 outputs must use one of seven fixed denominations.
+
+    10 mbit       10,000,000 ʙ
+     1 mbit        1,000,000 ʙ
+    10 kbit           10,000 ʙ
+     1 kbit            1,000 ʙ
+       100 ʙ             100 ʙ
+        10 ʙ              10 ʙ
+         1 ʙ               1 ʙ
+
+The seven denominations form a positional decimal system. Any integer
+amount can be expressed exactly through denomination combination.
+Non-standard denominations are rejected at the mempool.
+
+
+5.4 Validation Rules
+
+    R1   TX1 fee                  == 0                              mempool
+    R2   TX1 CLTV value           |CLTV − (H+1+432)| ≤ 30          mempool
+                                  |CLTV − (H+432)|   ≤ 10          pack time
+    R3   TX1 output denom         standard 7 only                   mempool
+    R3b  TX1 output set           greedy-optimal decomposition      mempool
+    R4   TX1 UTXO count           < 1000 per 6-block window         mempool
+                                  checked across all inputs
+    R8   TX1 output total         ≤ 1 MEM (all outputs)             mempool
+    min  TX1 output total         ≥ mempoolminvalue (default 10 ʙ) mempool
+    sa   TX1 single recipient     all CLTV outputs to same pubkeyhash mempool
+    Rc   TX1 change output        if change > 1 MEM, must return         mempool
+                                  to sender pubkeyhash
+    R5   TX2 fee                  == 0                              mempool
+    R6   TX2 input source         all inputs must be CLTV           mempool
+    R7   TX2 nLockTime            [CLTV+1−30, CLTV+1+30]            mempool
+
+R2: Bob estimates CLTV = current_height + 1 + 432 at broadcast time.
+The mempool applies a tolerance of ±30 blocks to accommodate propagation
+delay. The miner applies a strict tolerance of ±10 blocks at pack time.
+TX1 should be packed promptly after broadcast — a TX1 that remains in
+the mempool long enough for the chain to advance beyond the pack window
+will be rejected by miners and must be reconstructed with an updated
+CLTV value.
+
+R3b: TX1 outputs must use the greedy-optimal denomination decomposition
+for the total amount — the minimum number of standard outputs that sum
+to the total. Redundant splits (e.g. 23 × 1 ʙ instead of 10+10+1+1+1)
+are rejected. This naturally limits output count to at most 153 per TX1.
+
+R4: The 1000-UTXO limit per 6-block window is checked across all inputs
+of the transaction, scanning both mempool and the 6 most recent confirmed
+blocks.
+
+R6: All inputs must originate from CLTV-locked outputs. Transactions
+containing a mix of CLTV and non-CLTV inputs are rejected with
+tx2-mixed-inputs. Each input script must fully match the standard
+Memcoin CLTV output structure: <locktime> OP_CLTV OP_DROP OP_DUP
+OP_HASH160 <20-byte pubkeyhash> OP_EQUALVERIFY OP_CHECKSIG, with
+no extra bytes.
+
+R7: ±30 blocks handles chain reorganisation. A reorganisation deep
+enough to invalidate TX2 is highly unlikely on an active chain — the
+tolerance exists as a protocol guarantee, not a practical concern. If
+a reorg causes TX1 to be dropped and not re-included, Bob re-broadcasts
+TX1. Once TX1 is re-confirmed, the CLTV value in the output script is
+unchanged — Alice's TX2 nLockTime requires no modification. Alice must
+wait for TX1 to be re-confirmed before broadcasting TX2.
+
+When TX2 combines multiple CLTV inputs, each input's CLTV value
+must be compatible with a single nLockTime. Two inputs whose CLTV
+values differ by more than 60 blocks cannot share a valid nLockTime
+window and cannot be combined in one TX2. In practice, TX1
+transactions issued within the same ~10-hour period can be merged;
+those issued further apart must be spent separately.
+
+R8: The 1 MEM limit is the maximum total value of a single TX1.
+Payments exceeding 1 MEM require multiple TX1 transactions.
+
+min: mempoolminvalue sets the floor for TX1 acceptance.
+Configuration file takes precedence; the default is 10 ʙ
+if no value is set. Any TX1 whose total CLTV value falls
+below the local threshold is rejected at mempool entry.
+Setting this value to 0 disables the check entirely,
+allowing TX1 transactions of any amount including 1 ʙ.
+This parameter applies to TX1 only. TX2 has no minimum
+or maximum amount restriction.
+
+sa: All CLTV outputs in a single TX1 must lock to the same pubkeyhash.
+One TX1 issues to one recipient only.
+
+Rc: A TX1 change output exceeding 1 MEM must return to the sender's own
+pubkeyhash. Change of 1 MEM or less may go to any address. This prevents
+TX1 from being used as a zero-fee general-purpose transfer mechanism for
+large amounts.
+
+
+5.5 Network Governance
+
+Memcoin has no committee, no foundation, and no on-chain voting
+contract. mempoolminvalue serves two independent functions.
+
+The first is operational: each node operator sets a floor for TX1
+acceptance. Any TX1 whose total CLTV value falls below the local
+threshold is rejected at mempool entry — it does not propagate,
+does not reach miners, and does not consume network resources.
+This is the primary defence against zero-fee spam attacks on the
+instant payment system. Each operator sets this value independently.
+No one else determines it.
+
+The second is optional: when the community disagrees on any
+question — a protocol parameter, an upgrade, or anything else —
+mempoolminvalue can serve as an expression platform. The question
+can be anything. A technical upgrade. A community position. Who
+is the most beautiful person in the world.
+
+Because Yesmem requires only standard PC hardware, miners and
+users are the same population. A node operator's configuration
+is also a miner's configuration. The vote and its execution are
+the same action.
+
+The mechanism:
+
+    1. A proposer publishes a question, a signal value, and a
+       start block. The signal value sits above the current
+       network default and below the proposed threshold —
+       for example, 23 ʙ if the current default is 10 ʙ
+       and the proposed threshold is 25 ʙ.
+
+    2. Those who support the position set their local
+       mempoolminvalue to the proposed threshold before
+       the start block.
+
+    3. The proposer broadcasts one signal TX1 per block
+       for 144 blocks from the start height, using 144
+       independent UTXOs prepared in advance.
+
+    4. For each signal TX1, the proposer records whether the
+       immediately following block includes it or not. A block
+       that does not include it is counted as a rejection.
+       The transaction remains in non-supporters' mempools and
+       will eventually confirm in a later block — the count
+       measures each block's mining policy, not final settlement.
+
+       Rejected ≥ 96 (2/3)   position adopted
+       Rejected < 96          position not adopted
+
+The mathematics: at a 2/3 majority, 144 blocks detects the
+outcome with 99.999% confidence. The window matches the R4
+rate-limit window and provides sufficient statistical margin.
+
+An example. A community question: is Alice the most beautiful
+person in the world?
+
+    Proposer announces: signal value 23 ʙ, start block #1000
+    Supporters set mempoolminvalue = 25 ʙ before block #1000
+    Those who disagree make no change
+
+    For 144 blocks, the proposer broadcasts one 23 ʙ TX1 per
+    block. A supporter's block does not include it — the
+    transaction never entered their mempool. A non-supporter's
+    block includes it normally. Transactions not included by
+    their corresponding block remain in non-supporters' mempools
+    and confirm in subsequent blocks.
+
+    98 of 144 signal transactions were not included by their
+    corresponding block. 98 ≥ 96. Position adopted.
+
+This result carries no enforcement power. It cannot compel any
+action. It records that during those 144 blocks, more than two
+thirds of the network's hashrate set their local configuration
+to reflect this position.
+
+Three properties of the mechanism:
+
+    Objective       any person who counts independently arrives
+                    at the same number
+    Not executable  no code triggers automatically, no committee
+                    interprets the outcome
+
+The result is determined by real hashrate — computation backed
+by real energy expenditure and active configuration. A position
+held by two thirds of the network's mining power is detectable
+with 99.999% confidence across 144 blocks. No party controls
+this outcome. The mathematics has no tolerance for manipulation.
+
+The governance window closes after the 144-block observation
+period. The result is determined by block inclusion during
+that window, not by final settlement of the signal transactions.
+No other mechanism is required or exists.
+
+
+
+5.6 Security Model
+
+    Bob double-spends TX1         OP_CLTV — block invalid, network rejects
+    Bob double-spends TX1 input   block reward exceeds attack gain
+    (before TX1 confirms)         economically irrational at any tx size
+    Miner packs illegal TX        block rejected, miner loses block reward
+    TX2 replaced in mempool       mempoolreplacement=0 — conflict rejected
+    TX2 expires before lock       mempoolexpiry=45 days — survives 432-block lock
+    Chain reorganisation          R7 ±30 tolerance — Alice re-signs, no funds at risk
+    Non-standard denomination     R3 — rejected at mempool entry
+    Redundant denomination split  R3b — greedy-optimal required
+    TX1 spam (rate)               R4 — 1000 UTXO / 6-block window
+    TX1 spam (micro)              min — mempoolminvalue floor
+    TX1 multiple recipients       sa — single pubkeyhash enforced
+    Non-standard CLTV script      R6 — rejected at mempool entry
+    TX2 mixed inputs              R6 — tx2-mixed-inputs, all inputs
+                                  must be CLTV
+    Alice does not spend outputs  funds remain frozen in UTXO set permanently
+                                  Bob has no path to reclaim
+    TX1 as free transfer vector   Rc — change > 1 MEM must return
+                                  to sender pubkeyhash
+
+The primary protection against double-spend is OP_CLTV, a consensus
+rule: any block containing a transaction that spends a CLTV-locked
+output before its unlock height is invalid and rejected by the entire
+network. mempoolreplacement=0 is a protocol default that prevents
+conflicting TX1 transactions from entering the mempool — it reinforces
+but does not replace the consensus guarantee.
+
+Network-level spam is addressed through miner social consensus. Yesmem
+prevents large mining pools — miners are distributed individuals who can
+agree on a minimum TX1 input threshold without a hard fork. The attack
+cost equals the opportunity cost of locking capital for 432 blocks
+(~3 days), scaled by the community threshold. The shorter lock period
+reduces the barrier for legitimate users and increases system throughput;
+the community minimum input threshold offsets the reduced per-TX1 attack
+cost. Legitimate users are not affected because the threshold is
+publicly known.
+
+
+5.7 Zero-Confirmation Security
+
+A standard P2PKH transaction entering the mempool carries moderate
+zero-confirmation risk. Validity is established at mempool entry —
+signature correct, UTXO exists, fee sufficient — but the sender retains
+the ability to broadcast a conflicting transaction spending the same
+UTXO. mempoolreplacement=0 raises the cost of this attack but does not
+eliminate it at the protocol level.
+
+TX1 is different in kind, not degree. When TX1 enters the mempool,
+Bob's funds are frozen in CLTV-locked outputs assigned to Alice.
+mempoolreplacement=0 prevents any conflicting transaction from entering
+the mempool. A miner colluding with Bob could bypass the mempool and
+build a block that double-spends Bob's input — but at any realistic
+cheque value, this yields less than the foregone block reward.
+
+Alice does not need to wait for TX1 to confirm on-chain for everyday
+small transactions denominated in bit. At this scale, the maximum gain
+from a miner-coordinated double-spend is negligible compared to the
+block reward — no rational miner will sacrifice a block reward to
+capture a fraction of it.
+
+Once the CLTV lock expires at block H+432, Alice broadcasts TX2. In a
+single zero-fee transaction, she may combine any unlocked CLTV outputs,
+split the total into any amounts, and send to one or more addresses.
+Confirmed in one block.
+
+                        P2PKH           TX1 (instant payment)
+────────────────────    ────────────    ──────────────────────────
+Mempool entry proves    sig + UTXO      sig + UTXO + CLTV lock
+Sender can double-spend possible        economically irrational —
+                                        block reward exceeds max gain
+Zero-conf safety        moderate        sufficient for everyday use
+
+For larger amounts, recipients naturally wait for one confirmation
+before releasing goods or services. The design aligns incentives
+such that zero-confirmation is safe precisely where it is used,
+and confirmation is sought precisely where the value justifies it.
+
+
+5.8 Complete Flow
+
+    TX1 broadcast    TX1 enters mempool — payment is final
+    Block H          TX1 confirmed on-chain
+    H+1 to H+432     funds frozen — Bob cannot spend, Alice cannot spend
+    Block H+433      CLTV lock expires — Alice broadcasts TX2
+    Block H+434      TX2 confirms
+
+Any unspent outputs remain spendable by Alice at any time after
+H+432. Bob has no path to reclaim them.
+
+
+────────────────────────────────────────
+
+
+6. Network Security
+
+
+6.1 51% Attack Cost
+
+The cost of a 51% attack scales linearly with network size. Each
+attacking thread requires 7 GB of dedicated RAM — memory cannot be
+shared between threads. Block validation carries the same memory
+requirement as mining. Attack cost compounds: mining capacity plus
+verification capacity, neither reducible.
+
+Beyond a sufficient network size, the attack transitions from expensive
+to physically unavailable. Large-memory cloud capacity is finite and
+largely committed. The RAM floor excludes botnets.
+
+
+────────────────────────────────────────
+
+
+7. Protocol and Implementation
+
+
+Memcoin defines a protocol, not a software distribution. Anyone may
+write and distribute software that implements the protocol — wallets,
+payment interfaces, payment tools, block explorers, or mining
+clients. Conformance is determined by the protocol rules alone.
+
+Upgrades follow the same principle. A change to the protocol is adopted
+when miners include it in blocks and users accept those blocks. There is
+no committee, no foundation, and no roadmap. The network decides by
+running the software it chooses to run.
+
+Memcoin is a new ledger. It shares the philosophy of its predecessors —
+peer to peer, permissionless, no trusted third party — and carries
+nothing else forward. The chain starts at block zero.
+
+
+────────────────────────────────────────
+
+
+8. On Completeness
+
+Memcoin is finished. There is no roadmap because there is no destination
+that has not already been reached.
+
+A currency that moves value from one address to another, secured by
+computation and memory, with a predictable emission schedule, a mining
+algorithm that breathes in sync with the hardware running it, a zero-fee
+payment system that separates confirmation from settlement, and a slow
+correction built in for the damage that time inevitably causes.
+
+That is the complete design.
+
+
+────────────────────────────────────────
+
+— Memcoin (MEM) · 2026
